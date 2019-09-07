@@ -1,48 +1,63 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
   <meta charset="UTF-8">
   <title>Matador de Monstro</title>
+
   <link rel="stylesheet" href="style.css">
   <script src="https://unpkg.com/vue"></script>
 </head>
-
 <body>
   <div id="app">
-    <div class="panel scores">
-      <div class="score">
-        <h1>Jogador</h1>
-        <div class="life-bar">
-          <div class="life" :class="{danger: playerLife < 21, 
-          warning: (playerLife <= 40 && playerLife > 20) }" :style="{width: playerLife + '%'}"></div>
+      <div class="panel scores">
+        <div class="score">
+          <h1>Jogador</h1>
+          <div class="life-bar">
+            <div class="life"
+                  v-bind:class="{danger: playerLife <= 20,
+                                 warning: playerLife <= 50 && playerLife > 20}"
+                  :style="{width: playerLife + '%'}"></div>
+          </div>
+          <div>{{playerLife}}%</div>
         </div>
-        <div>{{playerLife}}%</div>
-      </div>
-      <div class="score">
-        <h1>Monstro</h1>
-        <div class="life-bar">
-          <!-- É associoado a classe danger a div quando monsterLife for < que 20
-          e warning quando monsterLife é < ou = a 40 e monsterLife sendo > que 20 -->
-          <div class="life" :class="{danger: monsterLife < 20,
-          warning: (monsterLife <= 40 && monsterLife > 20)}" :style="{width: monsterLife + '%'}"></div>
+        <div class="score">
+          <h1>Monstro</h1>
+          <div class="life-bar">
+            <div class="life"
+                  v-bind:class="{danger: monsterLife <= 20,
+                                warning: monsterLife <= 50 && monsterLife > 20}"
+                  :style="{width: monsterLife + '%'}"></div>
+          </div>
+          <div>{{monsterLife}}%</div>
         </div>
-        <div>{{monsterLife}}%</div>
       </div>
-    </div>
-  </div>
-  <div v-if="hasResult" class="panel result">
-    <div  v-if="monsterLife == 0" class="win">
-      Você venceu!!! :)
-    </div>
-    <div v-if="playerLife == 0" class="loser">
-      Você perdeu! :(
-    </div>
-  </div>
-  <div class="panel buttons">3</div>
-  <div class="panel logs">4</div>
+      <div v-if="hasResult" class="panel result">
+        <div v-if="monsterLife == 0 && playerLife > 0" class="win">Você ganhou!!! :)</div>
+        <div v-else-if="monsterLife == 0 && playerLife == 0">Empate!!! :|</div>
+        <div v-else class="lose">Você perdeu! :(</div>
+      </div>
+      <div class="panel buttons">
+        <template v-if="running">
+            <button class="btn attack"
+                    @click="attack(false)">Ataque</button>
+            <button class="btn especial-attack"
+                    @click="attack(true)">Ataque Especial</button>
+            <button class="btn heal"
+                    @click="healAndHurt()">Curar</button>
+            <button class="btn give-up"
+                    @click="running = false">Desistir</button>    
+        </template>
+        <button v-else class="btn new-game"
+                @click="startGame">Iniciar Jogo</button>
+      </div>
+      <div v-if="logs.length" class="panel logs">
+        <ul>
+          <li v-for="log in logs" class="log" :class="log.cls">
+            {{log.text}}
+          </li>
+        </ul>
+      </div>
   </div>
   <script src="app.js"></script>
 </body>
-
 </html>
